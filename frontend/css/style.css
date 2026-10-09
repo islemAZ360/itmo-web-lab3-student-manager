@@ -1,0 +1,114 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
+    padding: 15px;
+    margin: 0;
+    overflow-wrap: break-word; 
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 550px;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table, th, td {
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #eee;
+}
+
+
+td button {
+    padding: 4px 8px;
+    margin: 2px;
+    cursor: pointer;
+}
+
+/* 2. Form and Input controls */
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 15px;
+}
+
+input[type="checkbox"] {
+    width: auto;
+}
+
+button {
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+
+@media (max-width: 600px) {
+    body {
+        padding: 8px;
+    }
+
+    .container {
+        padding: 12px;
+    }
+
+    
+    #show-add-form-btn,
+    #close-dossier-btn,
+    #student-form button {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+.filter-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+.filter-box h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.filter-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.filter-inputs input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}

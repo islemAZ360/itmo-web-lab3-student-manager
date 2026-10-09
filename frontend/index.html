@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management</title>
+    <!--cat-->
+    <link rel="icon" type="image/svg+xml" href="assets/cat.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Student Management System</h1>
+        <!-- Student Filter Section -->
+        <div class="filter-box">
+            <h3>Student Filter</h3>
+            <div class="filter-inputs">
+                <input type="text" id="filter-name" placeholder="Full Name (e.g. Islam)" />
+                <input type="text" id="filter-group" placeholder="Group (e.g. M3301)" />
+                <input type="text" id="filter-dormitory" placeholder="Dormitory (e.g. 8)" />
+                <input type="text" id="filter-room" placeholder="Room (e.g. 314)" />
+                <input type="text" id="filter-isu" placeholder="ISU ID (e.g. 470449)" />
+            <div class="filter-buttons">
+                <button type="button" id="btn-search-get">Search (GET)</button>
+                <button type="button" id="btn-search-query">Search (QUERY)</button>
+                <button type="button" id="btn-reset-filter">Reset</button>
+            </div>
+        </div>
+
+        <!--header-->
+        <button id="show-add-form-btn" style="margin-bottom: 15px;">Add Student</button>
+
+        <!--table-->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Group</th>
+                        <th>ISU Number</th>
+                        <th>Room</th>
+                        <th>Procedures</th>
+                    </tr>
+                </thead>
+                <tbody id="student-body">
+                    <!--js-->
+                </tbody>
+            </table>
+        </div>
+
+        <!--profile view-->
+        <div id="student-dossier" class="card" style="display: none; margin-top: 25px;">
+            <h3>Student Dossier</h3>
+            <p><strong>Full Name:</strong> <span id="dossier-name"></span></p>
+            <p><strong>Group:</strong> <span id="dossier-group"></span></p>
+            <p><strong>ISU Number:</strong> <span id="dossier-isu"></span></p>
+            <p><strong>Dormitory:</strong> <span id="dossier-dorm"></span></p>
+            <p><strong>Room Number:</strong> <span id="dossier-room"></span></p>
+            <p><strong>Accommodation Period:</strong> <span id="dossier-date"></span></p>
+            <p><strong>Foreign Student:</strong><span id="dossier-foreign"></span></p>
+            <p><strong>Notes:</strong> <span id="dossier-notes"></span></p>
+            <br>
+            <button id="close-dossier-btn">Close</button>
+        </div>
+
+        <!--add / edit-->
+        <div id="student-form-section" class="card" style="display: none; margin-top: 25px;">
+            <h3 id="form-title">Add Student</h3>
+            <form id="student-form">
+                <!--full name-->
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" required maxlength="50" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$"
+                        title="Letters, spaces, and hyphens only">
+                </div>
+
+                <!--group -->
+                <div class="form-group">
+                    <label for="group">Group *</label>
+                    <input type="text" id="group" required maxlength="5" pattern="^[A-Z]\d{4}$"
+                        title="One Capital letter followed by 4 digits (like : P3224)">
+                </div>
+
+                <!--isuId-->
+                <div class="form-group">
+                    <label for="isuId">ISU ID (6 digits) *</label>
+                    <input type="text" id="isuId" required pattern="^\d{6}$" maxlength="6"
+                        title="Must be exactly 6 digits">
+                </div>
+
+                <!--dormitory-->
+                <div class="form-group">
+                    <label for="dormitoryNumber">Dormitory Number *</label>
+                    <input type="number" id="dormitoryNumber" required min="1" max="99">
+                </div>
+
+                <!--room-->
+                <div class="form-group">
+                    <label for="room">Room Number *</label>
+                    <input type="number" id="room" required min="1" max="9999">
+                </div>
+
+                <!--accommodation period-->
+                <div class="form-group">
+                    <label for="accommodationPeriod">Accommodation Period *</label>
+                    <input type="date" id="accommodationPeriod" required min="2020-01-01" max="2035-12-31">
+                </div>
+
+                <!--checkbox-->
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isInternational"> International Student
+                    </label>
+                </div>
+
+                <!--notes-->
+                <div class="form-group">
+                    <label for="notes">Notes (Max 150 characters)</label>
+                    <textarea id="notes" rows="3" maxlength="150"></textarea>
+                </div>
+
+                <button type="submit">Save</button>
+                <button type="button" id="cancel-form-btn">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
