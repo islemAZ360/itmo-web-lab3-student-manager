@@ -28,7 +28,7 @@ public class StudentController {
         return service.getFilteredStudents(params);
     }
 
-    @RequestMapping(method = RequestMethod.valueOf("POST"), path = "/search")
+    @PostMapping("/search")
     public List<StudentResponseDto> queryStudents(@RequestBody(required = false) Map<String, String> filters) {
         return service.getFilteredStudents(filters);
     }
