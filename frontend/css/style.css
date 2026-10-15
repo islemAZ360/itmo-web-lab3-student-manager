@@ -112,3 +112,23 @@ button {
     display: flex;
     gap: 8px;
 }
+
+.auth-bar {
+    border: 1px solid #ccc;
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: #eef3f7;
+}
+
+#auth-forms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+#auth-forms input, #auth-forms select {
+    width: auto;
+    margin: 0;
+    padding: 6px;
+}
