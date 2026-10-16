@@ -4,7 +4,6 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SortField;
-import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import ru.itmo.studentmanager.dto.StudentRequestDto;
 import ru.itmo.studentmanager.dto.StudentResponseDto;
