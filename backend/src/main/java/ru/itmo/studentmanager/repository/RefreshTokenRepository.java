@@ -31,7 +31,7 @@ public class RefreshTokenRepository {
     }
 
     public void save(Long userId, String token, LocalDateTime expiryDate) {
-        // নতুন টোকেন সেভ করার আগে ওই ইউজারের পুরনো টোকেন ডিলিট করে দেব
+        // Delete old tokens for this user before saving a new one
         deleteByUserId(userId);
 
         dsl.insertInto(table("refresh_tokens"))

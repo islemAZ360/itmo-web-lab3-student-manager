@@ -51,6 +51,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request body");
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadRequest(IllegalArgumentException ex) {
+        log.warn("Bad request parameter: {}", ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid request parameter format");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGeneric(Exception ex) {
         log.error("Unhandled internal server error", ex);

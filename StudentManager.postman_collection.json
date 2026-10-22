@@ -2,64 +2,167 @@
   "info": {
     "_postman_id": "471ff0ec-ae86-4f28-995a-7c611561deaf",
     "name": "ITMO Lab 3 - Student Manager",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "36760640"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" }
+  ],
   "item": [
     {
-      "name": "Register Admin",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
+      "name": "1. Register Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    var jsonData = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
         }
-      },
-      "response": []
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"email\": \"admin@itmo.ru\",\n  \"password\": \"admin123\",\n  \"role\": \"ADMIN\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+      }
     },
     {
-      "name": "Login",
+      "name": "2. Register Regular User",
       "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
-        }
-      },
-      "response": []
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"student_user\",\n  \"email\": \"user@itmo.ru\",\n  \"password\": \"user123\",\n  \"role\": \"USER\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+      }
     },
     {
-      "name": "Refresh Token",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
+      "name": "3. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    var jsonData = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
         }
-      },
-      "response": []
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      }
     },
     {
-      "name": "Get All Students",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
+      "name": "4. Refresh Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    var jsonData = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
         }
-      },
-      "response": []
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth", "refresh"] }
+      }
     },
     {
-      "name": "Create Student",
+      "name": "5. Get All Students",
       "request": {
         "method": "GET",
-        "header": [],
-        "url": {
-          "raw": ""
-        }
-      },
-      "response": []
+        "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "url": { "raw": "{{baseUrl}}/students", "host": ["{{baseUrl}}"], "path": ["students"] }
+      }
+    },
+    {
+      "name": "6. Search Students (POST Filter Body)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"group\": \"P3278\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/students/search", "host": ["{{baseUrl}}"], "path": ["students", "search"] }
+      }
+    },
+    {
+      "name": "7. Create Student (ADMIN only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isuId\": \"499123\",\n  \"fullName\": \"Ivan Petrov\",\n  \"group\": \"P3278\",\n  \"dormitoryNumber\": 8,\n  \"room\": 412,\n  \"accommodationPeriod\": \"2026-09-01\",\n  \"isInternational\": false,\n  \"notes\": \"Created via Postman\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/students", "host": ["{{baseUrl}}"], "path": ["students"] }
+      }
+    },
+    {
+      "name": "8. Update Student (PATCH - ADMIN only)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"room\": 505,\n  \"notes\": \"Moved to room 505\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/students/499123", "host": ["{{baseUrl}}"], "path": ["students", "499123"] }
+      }
+    },
+    {
+      "name": "9. Delete Student (ADMIN only)",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "url": { "raw": "{{baseUrl}}/students/499123", "host": ["{{baseUrl}}"], "path": ["students", "499123"] }
+      }
     }
   ]
 }
