@@ -198,3 +198,18 @@ th {
     margin-bottom: 15px;
     font-size: 13px;
 }
+
+#student-dossier {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid #e2e8f0;
+}

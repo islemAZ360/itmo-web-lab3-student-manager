@@ -124,8 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return filters;
     }
 
-    // Автовыбор GET / Query
+    // Автовыбор с проверкой
     document.getElementById("btn-search-auto").addEventListener("click", async () => {
+        if (!document.getElementById("filter-form").reportValidity()) return;
+
         const filters = getActiveFilters();
         const count = Object.keys(filters).length;
 
@@ -142,14 +144,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Ручной выбор запроса
+    // Ручной GET с проверкой
     document.getElementById("btn-search-get").addEventListener("click", () => {
+        if (!document.getElementById("filter-form").reportValidity()) return;
+
         const filters = getActiveFilters();
         const params = new URLSearchParams(filters);
         renderTable(params.toString() ? `?${params.toString()}` : "");
     });
 
+    // Ручной Query с проверкой
     document.getElementById("btn-search-query").addEventListener("click", async () => {
+        if (!document.getElementById("filter-form").reportValidity()) return;
+
         const filters = getActiveFilters();
         if (Object.keys(filters).length === 0) {
             alert("Please enter at least one filter before sending a Query Body request!");
@@ -163,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Сброс фильтра
     document.getElementById("btn-reset-filter").addEventListener("click", () => {
         document.getElementById("filter-form").reset();
         renderTable();
@@ -170,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("show-add-form-btn").addEventListener("click", openAddForm);
     document.getElementById("cancel-form-btn").addEventListener("click", closeForm);
-    document.getElementById("close-dossier-btn").addEventListener("click", () => {
+    document.getElementById("btn-close-dossier").addEventListener("click", () => {
         document.getElementById("student-dossier").style.display = "none";
     });
 
