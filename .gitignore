@@ -22,4 +22,6 @@ Thumbs.db
 
 # Aggregator Scripts & Bundles
 combine_code.*
+combine_code.bat
+combine_code.ps1
 combined_codebase.txt
