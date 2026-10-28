@@ -199,7 +199,8 @@ th {
     font-size: 13px;
 }
 
-#student-dossier {
+#student-dossier,
+#student-form-section {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -211,5 +212,7 @@ th {
     z-index: 1000;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
     border: 1px solid #e2e8f0;
 }
