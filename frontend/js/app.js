@@ -1,173 +1,171 @@
 let currentEditingIsu = null;
+let isRegisterMode = false;
 
 function isAdmin() {
     return localStorage.getItem("role") === "ADMIN";
 }
 
-function updateAuthUI() {
+function updateAppVisibility() {
     const token = getAccessToken();
-    const username = localStorage.getItem("username");
-    const role = localStorage.getItem("role");
+    const authScreen = document.getElementById("auth-screen");
+    const mainApp = document.getElementById("main-app");
 
-    const userInfo = document.getElementById("user-info");
-    const authForms = document.getElementById("auth-forms");
-    const addBtn = document.getElementById("show-add-form-btn");
-
-    if (token && username) {
-        userInfo.style.display = "block";
-        authForms.style.display = "none";
-        document.getElementById("current-username").textContent = username;
-        document.getElementById("current-role").textContent = role;
-        addBtn.style.display = isAdmin() ? "inline-block" : "none";
+    if (token) {
+        authScreen.style.display = "none";
+        mainApp.style.display = "block";
+        document.getElementById("current-username").textContent = localStorage.getItem("username") || "";
+        document.getElementById("current-role").textContent = localStorage.getItem("role") || "";
+        document.getElementById("show-add-form-btn").style.display = isAdmin() ? "inline-block" : "none";
+        renderTable();
     } else {
-        userInfo.style.display = "none";
-        authForms.style.display = "flex";
-        addBtn.style.display = "none";
+        authScreen.style.display = "flex";
+        mainApp.style.display = "none";
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    updateAuthUI();
-    renderTable();
+    updateAppVisibility();
 
-    document.getElementById("login-btn").addEventListener("click", async () => {
-        const username = document.getElementById("auth-username").value.trim();
-        const password = document.getElementById("auth-password").value.trim();
-        if (!username || !password) return alert("Please enter username and password");
+    // Переключение формы входа/регистрации
+    const toggleBtn = document.getElementById("auth-toggle-btn");
+    const authTitle = document.getElementById("auth-title");
+    const authSubmitBtn = document.getElementById("auth-submit-btn");
+    const emailGroup = document.getElementById("email-group");
+    const roleGroup = document.getElementById("role-group");
 
-        try {
-            const res = await loginUser(username, password);
-            if (res.ok) {
-                const data = await res.json();
-                saveAuthData(data);
-                updateAuthUI();
-                renderTable();
-            } else {
-                const err = await res.json().catch(() => ({}));
-                alert(err.error || err.message || "Invalid credentials");
-            }
-        } catch (e) {
-            alert("Failed to connect to authentication server");
+    toggleBtn.addEventListener("click", () => {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById("auth-error").style.display = "none";
+        document.getElementById("auth-success").style.display = "none";
+
+        if (isRegisterMode) {
+            authTitle.textContent = "Create Account";
+            authSubmitBtn.textContent = "Register";
+            toggleBtn.textContent = "Already have an account? Sign In";
+            emailGroup.style.display = "block";
+            roleGroup.style.display = "block";
+            document.getElementById("auth-email").required = true;
+        } else {
+            authTitle.textContent = "Sign In";
+            authSubmitBtn.textContent = "Login";
+            toggleBtn.textContent = "Need an account? Register";
+            emailGroup.style.display = "none";
+            roleGroup.style.display = "none";
+            document.getElementById("auth-email").required = false;
         }
     });
 
-    document.getElementById("register-btn").addEventListener("click", async () => {
+    // Авторизация и регистрация
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
         const username = document.getElementById("auth-username").value.trim();
-        const email = document.getElementById("auth-email").value.trim();
         const password = document.getElementById("auth-password").value.trim();
-        const role = document.getElementById("auth-role").value;
+        const errorBox = document.getElementById("auth-error");
+        const successBox = document.getElementById("auth-success");
 
-        if (!username || !email || !password) {
-            return alert("Please fill in username, email, and password");
-        }
+        errorBox.style.display = "none";
+        successBox.style.display = "none";
 
         try {
-            const res = await registerUser(username, email, password, role);
-            if (res.ok) {
-                alert("Registration successful! You can now log in.");
+            if (isRegisterMode) {
+                const email = document.getElementById("auth-email").value.trim();
+                const role = document.getElementById("auth-role").value;
+                const res = await registerUser(username, email, password, role);
+                if (res.ok) {
+                    successBox.textContent = "Registration successful! You can now log in.";
+                    successBox.style.display = "block";
+                    toggleBtn.click(); // Возврат к логину
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    errorBox.textContent = err.error || err.message || "Registration failed";
+                    errorBox.style.display = "block";
+                }
             } else {
-                const err = await res.json().catch(() => ({}));
-                alert(err.error || err.message || "Registration failed");
+                const res = await loginUser(username, password);
+                if (res.ok) {
+                    const data = await res.json();
+                    saveAuthData(data);
+                    updateAppVisibility();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    errorBox.textContent = err.error || err.message || "Invalid credentials";
+                    errorBox.style.display = "block";
+                }
             }
-        } catch (e) {
-            alert("Failed to connect to server");
+        } catch (err) {
+            errorBox.textContent = "Cannot connect to server. Ensure backend is running.";
+            errorBox.style.display = "block";
         }
     });
 
+    // Выход
     document.getElementById("logout-btn").addEventListener("click", () => {
         clearAuthData();
         closeForm();
         document.getElementById("student-dossier").style.display = "none";
-        updateAuthUI();
+        updateAppVisibility();
+    });
+
+    // Поиск и фильтрация
+    const filterForm = document.getElementById("filter-form");
+    filterForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("filter-name").value.trim();
+        const group = document.getElementById("filter-group").value.trim();
+        const dorm = document.getElementById("filter-dormitory").value.trim();
+        const room = document.getElementById("filter-room").value.trim();
+        const isu = document.getElementById("filter-isu").value.trim();
+
+        // Сбор параметров
+        const activeFilters = {};
+        if (name) activeFilters.fullName = name;
+        if (group) activeFilters.group = group;
+        if (dorm) activeFilters.dormitory = dorm;
+        if (room) activeFilters.room = room;
+        if (isu) activeFilters.isuId = isu;
+
+        const count = Object.keys(activeFilters).length;
+
+        // < 3 параметров: GET
+        // >= 3 параметров: POST/Query
+        if (count < 3) {
+            const params = new URLSearchParams(activeFilters);
+            const queryStr = params.toString() ? `?${params.toString()}` : "";
+            renderTable(queryStr);
+        } else {
+            try {
+                const students = await fetchStudentsWithQueryMethod(activeFilters);
+                updateTableHTML(students);
+            } catch (err) {
+                alert("Failed to filter data via query body");
+            }
+        }
+    });
+
+    document.getElementById("btn-reset-filter").addEventListener("click", () => {
+        filterForm.reset();
         renderTable();
     });
 
-    document.getElementById("show-add-form-btn").addEventListener("click", () => {
-        openAddForm();
-    });
-
-    document.getElementById("cancel-form-btn").addEventListener("click", () => {
-        closeForm();
-    });
-
+    document.getElementById("show-add-form-btn").addEventListener("click", openAddForm);
+    document.getElementById("cancel-form-btn").addEventListener("click", closeForm);
     document.getElementById("close-dossier-btn").addEventListener("click", () => {
         document.getElementById("student-dossier").style.display = "none";
     });
 
     document.getElementById("student-form").addEventListener("submit", handleFormSubmit);
-
-    const filterGetBtn = document.getElementById("btn-search-get");
-    const filterQueryBtn = document.getElementById("btn-search-query");
-    const filterResetBtn = document.getElementById("btn-reset-filter");
-
-    function getFilterValues() {
-        return {
-            fullName: document.getElementById("filter-name")?.value.trim() || "",
-            group: document.getElementById("filter-group")?.value.trim() || "",
-            dormitory: document.getElementById("filter-dormitory")?.value.trim() || "",
-            room: document.getElementById("filter-room")?.value.trim() || "",
-            isuId: document.getElementById("filter-isu")?.value.trim() || ""
-        };
-    }
-
-    if (filterGetBtn) {
-        filterGetBtn.addEventListener("click", () => {
-            const f = getFilterValues();
-            const params = new URLSearchParams();
-
-            if (f.fullName) params.append("fullName", f.fullName);
-            if (f.group) params.append("group", f.group);
-            if (f.dormitory) params.append("dormitory", f.dormitory);
-            if (f.room) params.append("room", f.room);
-            if (f.isuId) params.append("isuId", f.isuId);
-
-            const queryString = params.toString() ? `?${params.toString()}` : "";
-            renderTable(queryString);
-        });
-    }
-
-    if (filterQueryBtn) {
-        filterQueryBtn.addEventListener("click", async () => {
-            const f = getFilterValues();
-            const filters = {};
-
-            if (f.fullName) filters.fullName = f.fullName;
-            if (f.group) filters.group = f.group;
-            if (f.dormitory) filters.dormitory = f.dormitory;
-            if (f.room) filters.room = f.room;
-            if (f.isuId) filters.isuId = f.isuId;
-
-            try {
-                const students = await fetchStudentsWithQueryMethod(filters);
-                updateTableHTML(students);
-            } catch (error) {
-                alert("There was a problem filtering the data!");
-            }
-        });
-    }
-
-    if (filterResetBtn) {
-        filterResetBtn.addEventListener("click", () => {
-            if (document.getElementById("filter-name")) document.getElementById("filter-name").value = "";
-            if (document.getElementById("filter-group")) document.getElementById("filter-group").value = "";
-            if (document.getElementById("filter-dormitory")) document.getElementById("filter-dormitory").value = "";
-            if (document.getElementById("filter-room")) document.getElementById("filter-room").value = "";
-            if (document.getElementById("filter-isu")) document.getElementById("filter-isu").value = "";
-
-            renderTable();
-        });
-    }
 });
 
 async function renderTable(queryString = "") {
     const tableBody = document.getElementById("student-body");
-    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Loading data from server...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Loading data...</td></tr>`;
 
     try {
         const students = await fetchStudents(queryString);
         updateTableHTML(students);
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Please log in or check backend connection</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Failed to load data. Please re-login.</td></tr>`;
     }
 }
 
@@ -184,12 +182,12 @@ function updateTableHTML(students) {
 
     students.forEach(student => {
         const tr = document.createElement("tr");
-        let actions = `<button onclick="viewStudent('${student.isuId}')">View</button>`;
+        let actions = `<button class="btn btn-secondary" onclick="viewStudent('${student.isuId}')">View</button>`;
 
         if (admin) {
             actions += `
-                <button onclick="editStudent('${student.isuId}')">Edit</button>
-                <button onclick="removeStudent('${student.isuId}')">Delete</button>
+                <button class="btn btn-primary" onclick="editStudent('${student.isuId}')">Edit</button>
+                <button class="btn btn-danger" onclick="removeStudent('${student.isuId}')">Delete</button>
             `;
         }
 
@@ -216,14 +214,10 @@ function openAddForm() {
 async function editStudent(isu) {
     try {
         const student = await fetchStudentById(isu);
-        if (!student) {
-            alert("Student not found on server!");
-            return;
-        }
+        if (!student) return alert("Student not found!");
 
         currentEditingIsu = isu;
         document.getElementById("form-title").textContent = "Edit Student";
-
         document.getElementById("fullName").value = student.fullName;
         document.getElementById("group").value = student.group;
         document.getElementById("isuId").value = student.isuId;
@@ -236,8 +230,8 @@ async function editStudent(isu) {
 
         document.getElementById("student-form-section").style.display = "block";
         document.getElementById("student-dossier").style.display = "none";
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        console.error(err);
     }
 }
 
@@ -251,11 +245,9 @@ function closeForm() {
 async function handleFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
-
     if (!form.reportValidity()) return;
 
     const isuId = document.getElementById("isuId").value.trim();
-
     const studentData = {
         fullName: document.getElementById("fullName").value.trim(),
         group: document.getElementById("group").value.trim(),
@@ -268,12 +260,9 @@ async function handleFormSubmit(e) {
     };
 
     try {
-        let response;
-        if (currentEditingIsu) {
-            response = await updateStudent(currentEditingIsu, studentData);
-        } else {
-            response = await addStudent(studentData);
-        }
+        let response = currentEditingIsu
+            ? await updateStudent(currentEditingIsu, studentData)
+            : await addStudent(studentData);
 
         if (response.ok) {
             closeForm();
@@ -282,18 +271,15 @@ async function handleFormSubmit(e) {
             const errData = await response.json().catch(() => ({}));
             alert(errData.error || errData.message || "Operation failed!");
         }
-    } catch (error) {
-        alert("There was a problem communicating with the server!");
+    } catch (err) {
+        alert("Server communication error");
     }
 }
 
 async function viewStudent(isu) {
     try {
         const student = await fetchStudentById(isu);
-        if (!student) {
-            alert("Student not found on server!");
-            return;
-        }
+        if (!student) return alert("Student not found!");
 
         document.getElementById("dossier-name").textContent = student.fullName;
         document.getElementById("dossier-group").textContent = student.group;
@@ -306,23 +292,23 @@ async function viewStudent(isu) {
 
         document.getElementById("student-dossier").style.display = "block";
         document.getElementById("student-form-section").style.display = "none";
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        console.error(err);
     }
 }
 
 async function removeStudent(isu) {
     if (confirm(`Are you sure you want to delete student with ISU ${isu}?`)) {
         try {
-            const response = await deleteStudent(isu);
-            if (response.ok || response.status === 204) {
+            const res = await deleteStudent(isu);
+            if (res.ok || res.status === 204) {
                 document.getElementById("student-dossier").style.display = "none";
                 renderTable();
             } else {
-                alert("The student could not be deleted (check permissions or existence)!");
+                alert("Could not delete student (insufficient permissions).");
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
         }
     }
 }

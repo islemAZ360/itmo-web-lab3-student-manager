@@ -19,3 +19,7 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Aggregator Scripts & Bundles
+combine_code.*
+combined_codebase.txt

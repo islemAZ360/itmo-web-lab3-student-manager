@@ -3,6 +3,7 @@ package ru.itmo.studentmanager.repository;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.springframework.stereotype.Repository;
+import ru.itmo.studentmanager.model.RefreshToken;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -13,16 +14,14 @@ import static org.jooq.impl.DSL.table;
 @Repository
 public class RefreshTokenRepository {
 
-    public record RefreshTokenRecord(Long id, Long userId, String token, LocalDateTime expiryDate) {}
-
     private final DSLContext dsl;
 
     public RefreshTokenRepository(DSLContext dsl) {
         this.dsl = dsl;
     }
 
-    private RefreshTokenRecord mapRecord(Record r) {
-        return new RefreshTokenRecord(
+    private RefreshToken mapRecord(Record r) {
+        return new RefreshToken(
                 r.get("id", Long.class),
                 r.get("user_id", Long.class),
                 r.get("token", String.class),
@@ -31,7 +30,6 @@ public class RefreshTokenRepository {
     }
 
     public void save(Long userId, String token, LocalDateTime expiryDate) {
-        // Delete old tokens for this user before saving a new one
         deleteByUserId(userId);
 
         dsl.insertInto(table("refresh_tokens"))
@@ -40,7 +38,7 @@ public class RefreshTokenRepository {
                 .execute();
     }
 
-    public Optional<RefreshTokenRecord> findByToken(String token) {
+    public Optional<RefreshToken> findByToken(String token) {
         return dsl.select()
                 .from(table("refresh_tokens"))
                 .where(field("token", String.class).eq(token))

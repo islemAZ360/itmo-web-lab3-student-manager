@@ -51,19 +51,25 @@ public class StudentJooqRepository implements StudentRepository {
             String room = filters.get("room");
             String isuId = filters.getOrDefault("isuId", filters.get("isu"));
 
-            if (name != null && !name.isBlank()) {
+            if (name != null && !name.trim().isEmpty()) {
                 conditions.add(field("full_name", String.class).containsIgnoreCase(name.trim()));
             }
-            if (group != null && !group.isBlank()) {
+            if (group != null && !group.trim().isEmpty()) {
                 conditions.add(field("student_group", String.class).equalIgnoreCase(group.trim()));
             }
-            if (dormitory != null && !dormitory.isBlank()) {
-                conditions.add(field("dormitory_number", Integer.class).eq(Integer.parseInt(dormitory.trim())));
+            if (dormitory != null && !dormitory.trim().isEmpty()) {
+                try {
+                    int dormNum = Integer.parseInt(dormitory.trim());
+                    conditions.add(field("dormitory_number", Integer.class).eq(dormNum));
+                } catch (NumberFormatException ignored) {}
             }
-            if (room != null && !room.isBlank()) {
-                conditions.add(field("room", Integer.class).eq(Integer.parseInt(room.trim())));
+            if (room != null && !room.trim().isEmpty()) {
+                try {
+                    int roomNum = Integer.parseInt(room.trim());
+                    conditions.add(field("room", Integer.class).eq(roomNum));
+                } catch (NumberFormatException ignored) {}
             }
-            if (isuId != null && !isuId.isBlank()) {
+            if (isuId != null && !isuId.trim().isEmpty()) {
                 conditions.add(field("isu_id", String.class).eq(isuId.trim()));
             }
         }
@@ -74,8 +80,14 @@ public class StudentJooqRepository implements StudentRepository {
                 ? field(sortBy).desc()
                 : field(sortBy).asc();
 
-        int limit = filters != null && filters.containsKey("limit") ? Integer.parseInt(filters.get("limit")) : 100;
-        int offset = filters != null && filters.containsKey("offset") ? Integer.parseInt(filters.get("offset")) : 0;
+        int limit = 100;
+        int offset = 0;
+        if (filters != null) {
+            try {
+                if (filters.containsKey("limit")) limit = Integer.parseInt(filters.get("limit"));
+                if (filters.containsKey("offset")) offset = Integer.parseInt(filters.get("offset"));
+            } catch (NumberFormatException ignored) {}
+        }
 
         return dsl.select()
                 .from(table("students"))

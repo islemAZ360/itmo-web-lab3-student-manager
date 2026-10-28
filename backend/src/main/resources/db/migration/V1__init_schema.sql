@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL
+    role VARCHAR(20) NOT NULL CHECK (role IN ('USER', 'ADMIN'))
 );
 
 CREATE TABLE IF NOT EXISTS refresh_tokens (
@@ -14,11 +14,11 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 );
 
 CREATE TABLE IF NOT EXISTS students (
-    isu_id VARCHAR(6) PRIMARY KEY,
+    isu_id VARCHAR(6) PRIMARY KEY CHECK (isu_id ~ '^\d{6}$'),
     full_name VARCHAR(50) NOT NULL,
-    student_group VARCHAR(5) NOT NULL,
-    dormitory_number INT NOT NULL,
-    room INT NOT NULL,
+    student_group VARCHAR(5) NOT NULL CHECK (student_group ~ '^[A-Z]\d{4}$'),
+    dormitory_number INT NOT NULL CHECK (dormitory_number BETWEEN 1 AND 99),
+    room INT NOT NULL CHECK (room BETWEEN 1 AND 9999),
     accommodation_period DATE NOT NULL,
     is_international BOOLEAN NOT NULL DEFAULT FALSE,
     notes VARCHAR(150)
