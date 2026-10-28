@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (res.ok) {
                     successBox.textContent = "Registration successful! You can now log in.";
                     successBox.style.display = "block";
-                    toggleBtn.click(); // Возврат к логину
+                    toggleBtn.click();
                 } else {
                     const err = await res.json().catch(() => ({}));
                     errorBox.textContent = err.error || err.message || "Registration failed";
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return filters;
     }
 
-    // Автовыбор с проверкой
+    // Автовыбор GET / Query с валидацией
     document.getElementById("btn-search-auto").addEventListener("click", async () => {
         if (!document.getElementById("filter-form").reportValidity()) return;
 
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Ручной GET с проверкой
+    // Ручной GET с валидацией
     document.getElementById("btn-search-get").addEventListener("click", () => {
         if (!document.getElementById("filter-form").reportValidity()) return;
 
@@ -152,8 +152,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(filters);
         renderTable(params.toString() ? `?${params.toString()}` : "");
     });
-
-    // Ручной Query с проверкой
+    
+    // Ручной Query с валидацией
     document.getElementById("btn-search-query").addEventListener("click", async () => {
         if (!document.getElementById("filter-form").reportValidity()) return;
 
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("show-add-form-btn").addEventListener("click", openAddForm);
     document.getElementById("cancel-form-btn").addEventListener("click", closeForm);
-    document.getElementById("btn-close-dossier").addEventListener("click", () => {
+    document.getElementById("close-dossier-btn").addEventListener("click", () => {
         document.getElementById("student-dossier").style.display = "none";
     });
 

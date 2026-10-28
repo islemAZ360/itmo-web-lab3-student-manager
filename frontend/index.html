@@ -70,19 +70,19 @@
                         <small class="error-msg" id="err-filter-name"></small>
                     </div>
                     <div class="filter-field">
-                        <input type="text" id="filter-group" pattern="^[A-Z]\d{4}$" maxlength="5" placeholder="Group (e.g. P3278)">
+                        <input type="text" id="filter-group" pattern="^[A-Za-zА-Яа-я]\d{4}$" maxlength="5" placeholder="Group (e.g. P3278)" title="Формат: одна буква и 4 цифры (например: P3278)">
                         <small class="error-msg" id="err-filter-group"></small>
                     </div>
                     <div class="filter-field">
-                        <input type="number" id="filter-dormitory" min="1" max="99" placeholder="Dormitory (1-99)">
+                        <input type="number" id="filter-dormitory" min="1" max="99" placeholder="Dormitory (1-99)" title="Номер общежития от 1 до 99">
                         <small class="error-msg" id="err-filter-dormitory"></small>
                     </div>
                     <div class="filter-field">
-                        <input type="number" id="filter-room" min="1" max="9999" placeholder="Room (1-9999)">
+                        <input type="number" id="filter-room" min="1" max="9999" placeholder="Room (1-9999)" title="Номер комнаты от 1 до 9999">
                         <small class="error-msg" id="err-filter-room"></small>
                     </div>
                     <div class="filter-field">
-                        <input type="text" id="filter-isu" pattern="^\d{6}$" maxlength="6" placeholder="ISU ID (6 digits)">
+                        <input type="text" id="filter-isu" pattern="^\d{6}$" maxlength="6" placeholder="ISU ID (6 digits)" title="Формат: ровно 6 цифр (например: 470449)">
                         <small class="error-msg" id="err-filter-isu"></small>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
             </table>
         </div>
 
-        <!-- Досье студента -->
+        <!-- Досье студента (Modal) -->
         <div id="student-dossier" class="card" style="display: none;">
             <h3>Student Dossier</h3>
             <p><strong>Full Name:</strong> <span id="dossier-name"></span></p>
@@ -124,7 +124,7 @@
             <p><strong>Foreign Student:</strong> <span id="dossier-foreign"></span></p>
             <p><strong>Notes:</strong> <span id="dossier-notes"></span></p>
             <br>
-            <button type="button" id="btn-close-dossier" class="btn btn-secondary" style="margin-top: 15px;">Close</button>
+            <button type="button" id="close-dossier-btn" class="btn btn-secondary" style="margin-top: 15px;">Close</button>
         </div>
 
         <!-- Форма студента -->
@@ -133,27 +133,27 @@
             <form id="student-form">
                 <div class="form-group">
                     <label for="fullName">Full Name *</label>
-                    <input type="text" id="fullName" required maxlength="50" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$">
+                    <input type="text" id="fullName" required maxlength="50" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" title="Только буквы, пробелы и дефисы">
                 </div>
 
                 <div class="form-group">
                     <label for="group">Group *</label>
-                    <input type="text" id="group" required maxlength="5" pattern="^[A-Z]\d{4}$">
+                    <input type="text" id="group" required maxlength="5" pattern="^[A-Za-zА-Яа-я]\d{4}$" title="Формат: одна буква и 4 цифры (например: P3278)">
                 </div>
 
                 <div class="form-group">
                     <label for="isuId">ISU ID (6 digits) *</label>
-                    <input type="text" id="isuId" required pattern="^\d{6}$" maxlength="6">
+                    <input type="text" id="isuId" required pattern="^\d{6}$" maxlength="6" title="Формат: ровно 6 цифр (например: 470449)">
                 </div>
 
                 <div class="form-group">
                     <label for="dormitoryNumber">Dormitory Number (1-99) *</label>
-                    <input type="number" id="dormitoryNumber" required min="1" max="99">
+                    <input type="number" id="dormitoryNumber" required min="1" max="99" title="Номер общежития от 1 до 99">
                 </div>
 
                 <div class="form-group">
                     <label for="room">Room Number (1-9999) *</label>
-                    <input type="number" id="room" required min="1" max="9999">
+                    <input type="number" id="room" required min="1" max="9999" title="Номер комнаты от 1 до 9999">
                 </div>
 
                 <div class="form-group">
