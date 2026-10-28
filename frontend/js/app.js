@@ -106,36 +106,35 @@ document.addEventListener("DOMContentLoaded", () => {
         updateAppVisibility();
     });
 
-    // Поиск и фильтрация
-    const filterForm = document.getElementById("filter-form");
-    filterForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
+    // Сбор полей фильтра
+    function getActiveFilters() {
+        const filters = {};
         const name = document.getElementById("filter-name").value.trim();
         const group = document.getElementById("filter-group").value.trim();
         const dorm = document.getElementById("filter-dormitory").value.trim();
         const room = document.getElementById("filter-room").value.trim();
         const isu = document.getElementById("filter-isu").value.trim();
 
-        // Сбор параметров
-        const activeFilters = {};
-        if (name) activeFilters.fullName = name;
-        if (group) activeFilters.group = group;
-        if (dorm) activeFilters.dormitory = dorm;
-        if (room) activeFilters.room = room;
-        if (isu) activeFilters.isuId = isu;
+        if (name) filters.fullName = name;
+        if (group) filters.group = group;
+        if (dorm) filters.dormitory = dorm;
+        if (room) filters.room = room;
+        if (isu) filters.isuId = isu;
 
-        const count = Object.keys(activeFilters).length;
+        return filters;
+    }
 
-        // < 3 параметров: GET
-        // >= 3 параметров: POST/Query
+    // Автовыбор GET / Query
+    document.getElementById("btn-search-auto").addEventListener("click", async () => {
+        const filters = getActiveFilters();
+        const count = Object.keys(filters).length;
+
         if (count < 3) {
-            const params = new URLSearchParams(activeFilters);
-            const queryStr = params.toString() ? `?${params.toString()}` : "";
-            renderTable(queryStr);
+            const params = new URLSearchParams(filters);
+            renderTable(params.toString() ? `?${params.toString()}` : "");
         } else {
             try {
-                const students = await fetchStudentsWithQueryMethod(activeFilters);
+                const students = await fetchStudentsWithQueryMethod(filters);
                 updateTableHTML(students);
             } catch (err) {
                 alert("Failed to filter data via query body");
@@ -143,8 +142,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Ручной выбор запроса
+    document.getElementById("btn-search-get").addEventListener("click", () => {
+        const filters = getActiveFilters();
+        const params = new URLSearchParams(filters);
+        renderTable(params.toString() ? `?${params.toString()}` : "");
+    });
+
+    document.getElementById("btn-search-query").addEventListener("click", async () => {
+        const filters = getActiveFilters();
+        if (Object.keys(filters).length === 0) {
+            alert("Please enter at least one filter before sending a Query Body request!");
+            return;
+        }
+        try {
+            const students = await fetchStudentsWithQueryMethod(filters);
+            updateTableHTML(students);
+        } catch (err) {
+            alert("Failed to filter data via query body");
+        }
+    });
+
     document.getElementById("btn-reset-filter").addEventListener("click", () => {
-        filterForm.reset();
+        document.getElementById("filter-form").reset();
         renderTable();
     });
 
